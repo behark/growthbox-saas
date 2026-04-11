@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./globals.css";
 // Removed Google Fonts due to network restrictions
 const geistSans = { variable: "--font-geist-sans" };
 const geistMono = { variable: "--font-geist-mono" };
