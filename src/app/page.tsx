@@ -19,9 +19,15 @@ export default function Dashboard() {
     try {
       const res = await fetch("/api/clients");
       const data = await res.json();
-      setClients(data);
+      if (Array.isArray(data)) {
+        setClients(data);
+      } else {
+        console.error("Fetched data is not an array:", data);
+        setClients([]);
+      }
     } catch (e) {
-      console.error(e);
+      console.error("Failed to fetch clients:", e);
+      setClients([]);
     }
   };
 
