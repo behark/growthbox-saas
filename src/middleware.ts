@@ -16,41 +16,33 @@ export const config = {
 
 export default function middleware(req: NextRequest) {
   const url = req.nextUrl;
+  const host = req.headers.get('host') || '';
 
-  // Get hostname of request (e.g. demo.vercel.pub, demo.localhost:3000)
-  let hostname = req.headers
-    .get('host')!
-    .replace('.localhost:3000', `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`);
-
-  // Special case for Vercel preview deployment URLs
-  if (
-    hostname.includes('---') &&
-    hostname.endsWith(`.${process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_SUFFIX}`)
-  ) {
-    hostname = `${hostname.split('---')[0]}.${
-      process.env.NEXT_PUBLIC_ROOT_DOMAIN
-    }`;
-  }
-
-  const searchParams = req.nextUrl.searchParams.toString();
-  // Get the pathname of the request (e.g. /, /about, /blog/first-post)
-  const path = `${url.pathname}${
-    searchParams.length > 0 ? `?${searchParams}` : ''
-  }`;
-
-  // If it's the root domain or localhost directly, serve the main dashboard app
-  if (
-    hostname === 'localhost:3000' ||
-    hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN
-  ) {
-    return NextResponse.rewrite(
-      new URL(`${path}`, req.url)
-    );
-  }
-
-  // Rewrite subdomain requests to /domain/[hostname]
-  const subdomain = hostname.split('.')[0];
+  // Define the root domain (the main dashboard)
+  const ROOT_DOMAIN = 'growthbox.vercel.app';
   
+  // Special case for Vercel preview deployment URLs (contains ---)
+  const isPreview = host.includes('---');
+  
+  // Get the pathname
+  const searchParams = req.nextUrl.searchParams.toString();
+  const path = `${url.pathname}${searchParams.length > 0 ? `?${searchParams}` : ''}`;
+
+  // If it's the root domain, localhost, or matches the root pattern, serve the dashboard
+  if (
+    host === 'localhost:3000' ||
+    host === ROOT_DOMAIN ||
+    host === `www.${ROOT_DOMAIN}` ||
+    (isPreview && !host.includes('.localhost'))
+  ) {
+    return NextResponse.rewrite(new URL(`${path}`, req.url));
+  }
+
+  // For subdomain requests, extract the subdomain
+  const parts = host.split('.');
+  const subdomain = parts[0];
+  
+  // Rewrite subdomain requests to /domain/[subdomain]
   return NextResponse.rewrite(
     new URL(`/domain/${subdomain}${path}`, req.url)
   );

@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../lib/prisma";
 import { Phone, CheckCircle, ArrowRight, Shield, Clock, MapPin } from "lucide-react";
 
 export default async function ClientSite({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
 

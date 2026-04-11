@@ -1,18 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
 import { Rocket, Globe, FileText, Settings, Loader2 } from "lucide-react";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [generatingBlogs, setGeneratingBlogs] = useState<string | null>(null);
   const [clients, setClients] = useState<any[]>([]);
+  const [selectedNiche, setSelectedNiche] = useState<string>("");
 
   const fetchClients = async () => {
     try {
@@ -56,7 +57,7 @@ export default function Dashboard() {
     try {
       const form = e.target as HTMLFormElement;
       const businessName = (form.elements.namedItem('businessName') as HTMLInputElement).value;
-      const niche = (form.elements.namedItem('niche') as HTMLSelectElement).value;
+      const niche = selectedNiche;
       const location = (form.elements.namedItem('location') as HTMLInputElement).value;
 
       const response = await fetch('/api/generate', {
@@ -111,14 +112,18 @@ export default function Dashboard() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="niche">Business Niche</Label>
-                <select id="niche" required className="flex h-10 w-full items-center justify-between rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                  <option value="" disabled selected>Select a niche</option>
-                  <option value="plumbing">Plumbing</option>
-                  <option value="hvac">HVAC</option>
-                  <option value="dentist">Dentist</option>
-                  <option value="legal">Law Firm</option>
-                  <option value="restaurant">Restaurant</option>
-                </select>
+                <Select value={selectedNiche} onValueChange={(val) => setSelectedNiche(val ?? "")} required>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a niche" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="plumbing">Plumbing</SelectItem>
+                    <SelectItem value="hvac">HVAC</SelectItem>
+                    <SelectItem value="dentist">Dentist</SelectItem>
+                    <SelectItem value="legal">Law Firm</SelectItem>
+                    <SelectItem value="restaurant">Restaurant</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="location">Target City / Location</Label>

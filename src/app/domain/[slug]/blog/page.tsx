@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../../lib/prisma";
 import Link from "next/link";
 import { ArrowLeft, Clock } from "lucide-react";
 
 export default async function BlogIndexPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
 
